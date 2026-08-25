@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 
 from pricing import black_scholes
 from greeks import calculate_greeks
-
+from implied_volatility import implied_volatility
 
 # --------------------------------------------------
 # Heading
@@ -111,6 +111,34 @@ with col1:
 with col2:
     st.metric("Put Price", f"${put:.2f}")
 
+# --------------------------------------------------
+# Implied Volatility
+# --------------------------------------------------
+st.subheader("Implied Volatility")
+
+market_price = st.number_input(
+    "Market Option Price",
+    min_value=0.01,
+    value=10.00,
+    step=0.01
+)
+
+iv = implied_volatility(
+    market_price=market_price,
+    S=stock_price,
+    K=strike_price,
+    r=risk_free_rate,
+    T=T,
+    option_type=option_type
+)
+
+if iv is not None:
+    st.metric(
+        "Implied Volatility",
+        f"{iv:.2%}"
+    )
+else:
+    st.warning("Could not calculate implied volatility.")
 
 # --------------------------------------------------
 # Current Greeks
