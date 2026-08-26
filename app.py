@@ -10,9 +10,17 @@ from implied_volatility import implied_volatility
 # Heading
 # --------------------------------------------------
 
-st.title("Black-Scholes Option Pricer")
-st.write("An interactive option pricing and risk analysis tool.")
+st.set_page_config(
+    page_title="Black-Scholes Option Pricer",
+    page_icon="📈",
+    layout="wide"
+)
 
+st.title("Black-Scholes Option Pricer")
+st.caption(
+    "Interactive option valuation, Greeks, implied volatility, "
+    "scenario analysis, and position risk."
+)
 
 # --------------------------------------------------
 # Inputs
@@ -22,6 +30,8 @@ option_type = st.selectbox(
     "Option Type",
     ["Call", "Put"]
 )
+
+st.caption(f"Selected position: {option_type}")
 
 col1, col2 = st.columns(2)
 
@@ -43,7 +53,7 @@ with col1:
     )
 
     volatility = st.slider(
-        "Volatility",
+        "Volatility (%)",
         min_value=0.10,
         max_value=0.40,
         value=0.20,
@@ -83,9 +93,8 @@ contracts = st.number_input(
 
 contract_multiplier = 100
 
-
 # --------------------------------------------------
-# Current Option Prices
+# Option Valution
 # --------------------------------------------------
 
 call, put, d1, d2 = black_scholes(
@@ -101,20 +110,8 @@ if option_type == "Call":
 else:
     option_price = put
 
-st.subheader("Option Prices")
-
-col1, col2 = st.columns(2)
-
-with col1:
-    st.metric("Call Price", f"${call:.2f}")
-
-with col2:
-    st.metric("Put Price", f"${put:.2f}")
-
-# --------------------------------------------------
-# Implied Volatility
-# --------------------------------------------------
-st.subheader("Implied Volatility")
+st.divider()
+st.subheader("Option Valuation")
 
 market_price = st.number_input(
     "Market Option Price",
@@ -132,13 +129,19 @@ iv = implied_volatility(
     option_type=option_type
 )
 
-if iv is not None:
-    st.metric(
-        "Implied Volatility",
-        f"{iv:.2%}"
-    )
-else:
-    st.warning("Could not calculate implied volatility.")
+col1, col2, col3 = st.columns(3)
+
+with col1:
+    st.metric("Call Price", f"${call:.2f}")
+
+with col2:
+    st.metric("Put Price", f"${put:.2f}")
+
+with col3:
+    if iv is not None:
+        st.metric("Implied Volatility", f"{iv:.2%}")
+    else:
+        st.metric("Implied Volatility", "N/A")
 
 # --------------------------------------------------
 # Current Greeks
@@ -198,26 +201,27 @@ with col2:
 # Scenario Analysis
 # --------------------------------------------------
 
+st.divider()
 st.subheader("Scenario Analysis")
 
-scenario_stock_price = st.number_input(
-    "Scenario Stock Price",
-    min_value=1.0,
-    value=stock_price,
-    step=1.0
-)
+col1, col2 = st.columns(2)
 
-scenario_volatility = st.number_input(
-    "Scenario Volatility",
-    min_value=0.01,
-    max_value=1.00,
-    value=volatility,
-    step=0.01
-)
+with col1:
+    scenario_stock_price = st.number_input(
+        "Scenario Stock Price",
+        min_value=1.0,
+        value=stock_price,
+        step=1.0
+    )
 
-st.write(
-    f"Scenario Volatility: {scenario_volatility:.0%}"
-)
+with col2:
+    scenario_volatility = st.number_input(
+        "Scenario Volatility (%)",
+        min_value=0.01,
+        max_value=1.00,
+        value=volatility,
+        step=0.01
+    )
 
 scenario_call, scenario_put, scenario_d1, scenario_d2 = black_scholes(
     scenario_stock_price,
@@ -237,19 +241,19 @@ else:
 # Current vs Scenario Price
 # --------------------------------------------------
 
-st.subheader("Current vs Scenario")
+st.markdown("#### Option Price Comparison")
 
 col1, col2 = st.columns(2)
 
 with col1:
     st.metric(
-        f"Current {option_type}",
+        f"Current {option_type} Price",
         f"${option_price:.2f}"
     )
 
 with col2:
     st.metric(
-        f"Scenario {option_type}",
+        f"Scenario {option_type} Price",
         f"${scenario_option_price:.2f}",
         delta=f"${scenario_option_price - option_price:.2f}"
     )
@@ -292,7 +296,7 @@ else:
 # Current vs Scenario Greeks
 # --------------------------------------------------
 
-st.subheader("Current vs Scenario Greeks")
+st.markdown("#### Greeks Comparison")
 
 col1, col2 = st.columns(2)
 
@@ -357,7 +361,7 @@ scenario_pnl = (
     * contract_multiplier
 )
 
-st.subheader("Current vs Scenario Position P&L")
+st.markdown("#### Position P&L")
 
 col1, col2 = st.columns(2)
 
