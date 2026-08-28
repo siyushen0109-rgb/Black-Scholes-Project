@@ -55,17 +55,12 @@ The model uses:
 - $T$ — time to expiration
 - $N(\cdot)$ — standard normal cumulative distribution function
 
-### Implied Volatility
+## Implied Volatility
 
 Implied volatility is estimated numerically using the Newton-Raphson method:
 
 $$
-\sigma_{n+1}
-=
-\sigma_n
--
-\frac{V(\sigma_n)-V_{\text{market}}}
-{\text{Vega}(\sigma_n)}
+\sigma_{n+1} = \sigma_n - \frac{V(\sigma_n) - V_{\text{market}}}{\text{Vega}(\sigma_n)}
 $$
 
 The solver iteratively adjusts volatility until the Black-Scholes model price converges to the supplied market option price. Additional safeguards handle invalid no-arbitrage prices, near-zero Vega, and non-physical volatility estimates.
